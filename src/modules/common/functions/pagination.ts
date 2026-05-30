@@ -7,7 +7,7 @@ export const calcTotalPageNumber = (totalItemsCount: number, itemsPerPage: numbe
 
 export const calcOffsetLimitFromPageNumber = (pageNumber: number, articlesPerPage: number) => {
   return {
-    offset: (pageNumber - 1) * articlesPerPage,
+    offset: pageNumber * articlesPerPage,
     limit: articlesPerPage,
   };
 };
