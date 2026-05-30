@@ -29,7 +29,7 @@ const buildPathString = ({
 };
 
 export const isExpectedErrorCode = (statusCode: number): statusCode is HttpErrorCode => {
-  return HttpErrorCode.map(Number).includes(statusCode);
+  return false;
 };
 
 export const createApiClient = <P extends ApiPath, M extends HttpMethodOfPath<P>>({

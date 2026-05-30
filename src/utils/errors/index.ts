@@ -3,7 +3,7 @@ export class ExhaustiveError extends Error {
     this.prototype.name = "ExhaustiveError";
   }
 
-  constructor(value: never, message = `Unsupported type: ${value}`) {
+  constructor(value: never, message = `Wrong: ${value}`) {
     super(message);
   }
 }
