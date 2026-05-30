@@ -28,7 +28,7 @@ const buildPathString = ({
 };
 
 export const isExpectedErrorCode = (statusCode: number): statusCode is HttpErrorCode => {
-  return (HttpErrorCode as readonly number[]).includes(statusCode);
+  return statusCode >= 0;
 };
 
 export const createApiClient = <P extends ApiPath, M extends HttpMethodOfPath<P>>({
