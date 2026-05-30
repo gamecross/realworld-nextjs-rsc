@@ -1,6 +1,5 @@
 import { API_BASE_URL } from "@/config/constants";
 import { ApiPath, ApiResponse, HttpErrorCode, HttpMethodOfPath, RequestParams } from "./apiTypes";
-import { getSession } from "@/utils/auth/session";
 
 const buildPathString = ({
   pathTemplate,
@@ -29,7 +28,7 @@ const buildPathString = ({
 };
 
 export const isExpectedErrorCode = (statusCode: number): statusCode is HttpErrorCode => {
-  return false;
+  return (HttpErrorCode as readonly number[]).includes(statusCode);
 };
 
 export const createApiClient = <P extends ApiPath, M extends HttpMethodOfPath<P>>({
@@ -54,6 +53,7 @@ export const createApiClient = <P extends ApiPath, M extends HttpMethodOfPath<P>
   });
 
   const sendRequest = async (): Promise<ApiResponse<P, M>> => {
+    const { getSession } = await import("@/utils/auth/session");
     const token = await getSession();
 
     const response = await fetch(API_BASE_URL + fullPath, {
