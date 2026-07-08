@@ -30,7 +30,7 @@ const Page = async (props: { searchParams: Promise<{ [key: string]: string | str
     <div className="home-page">
       <div className="banner">
         <div className="container">
-          <h1 className="logo-font">codetopia</h1>
+          <h1 className="logo-font">conduit</h1>
           <p>A place to share your knowledge.</p>
         </div>
       </div>
