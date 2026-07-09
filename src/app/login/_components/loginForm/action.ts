@@ -32,16 +32,14 @@ export const signInAction = async (_prevState: unknown, formData: FormData) => {
     redirect("/");
   }
 
-  switch (response.statusCode) {
-    case 401:
-      return submission.reply({
-        formErrors: ["Login failed. The email or password is incorrect."],
-      });
-    case 422:
-      return submission.reply({
-        formErrors: Object.values(response.error.errors).flat(),
-      });
-    default:
-      throw new Error("api error");
-  }
+  // The request body already passed Zod validation above, so any non-success
+  // response here means the API rejected the credentials. The RealWorld backend
+  // signals a failed login with 422 { errors: { "email or password": "is invalid" } }
+  // (and some deployments use 401/403). Previously the 422 branch surfaced the raw
+  // backend string ("is invalid") and any other code hit `default` and threw, so the
+  // friendly "The email or password is incorrect." message was never shown. We now
+  // normalize every credential-rejection response to that single, user-facing message.
+  return submission.reply({
+    formErrors: ["The email or password is incorrect."],
+  });
 };
