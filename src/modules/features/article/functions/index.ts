@@ -8,3 +8,11 @@ export const convertMarkdownToHtml = async (markdown: string) => {
 
   return processed.toString();
 };
+
+type MaybeUser = { username: string } | null | undefined;
+
+export const showFollowButton = (authorUsername: string, user: MaybeUser) => authorUsername !== user?.username;
+
+export const showEditArticleButton = (authorUsername: string, user: MaybeUser) => authorUsername === user?.username;
+
+export const showDeleteArticleButton = (authorUsername: string, user: MaybeUser) => authorUsername === user?.username;
