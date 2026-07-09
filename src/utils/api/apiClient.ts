@@ -76,11 +76,25 @@ export const createApiClient = <P extends ApiPath, M extends HttpMethodOfPath<P>
     }
 
     if (isExpectedErrorCode(response.status)) {
+      // Some error responses (e.g. 401 Unauthorized) carry no body per the API
+      // spec. Calling response.json() on an empty body throws a SyntaxError,
+      // which would propagate out of the server action and crash the request
+      // before the form can surface its error message. Parse defensively.
+      const rawBody = await response.text();
+      let error: unknown = undefined;
+      if (rawBody) {
+        try {
+          error = JSON.parse(rawBody);
+        } catch {
+          error = undefined;
+        }
+      }
+
       return {
         result: "error",
         statusCode: response.status,
-        error: await response.json(),
-      };
+        error,
+      } as ApiResponse<P, M>;
     }
 
     throw new Error("Unexpected error.");
