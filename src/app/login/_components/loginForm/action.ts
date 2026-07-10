@@ -32,16 +32,11 @@ export const signInAction = async (_prevState: unknown, formData: FormData) => {
     redirect("/");
   }
 
-  switch (response.statusCode) {
-    case 401:
-      return submission.reply({
-        formErrors: ["Login failed. The email or password is incorrect."],
-      });
-    case 422:
-      return submission.reply({
-        formErrors: Object.values(response.error.errors).flat(),
-      });
-    default:
-      throw new Error("api error");
-  }
+  // Invalid credentials can surface under different HTTP statuses depending on
+  // the backend (401 Unauthorized, 403 Forbidden, or 422 Unprocessable Entity).
+  // For the login endpoint any error result means the sign-in attempt failed, so
+  // always surface the same friendly, form-level message the UI expects.
+  return submission.reply({
+    formErrors: ["The email or password is incorrect."],
+  });
 };
