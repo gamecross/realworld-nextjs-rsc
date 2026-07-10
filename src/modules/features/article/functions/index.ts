@@ -3,16 +3,16 @@ import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
 import { unified } from "unified";
 
-import type { User } from "@/utils/types/models";
+type CurrentUser = { username: string } | null | undefined;
 
-export const showFollowButton = (authorUsername: string, currentUser?: Pick<User, "username">) =>
+export const showFollowButton = (authorUsername: string, currentUser?: CurrentUser) =>
   authorUsername !== currentUser?.username;
 
-export const showEditArticleButton = (authorUsername: string, currentUser?: Pick<User, "username">) =>
-  !!currentUser && authorUsername === currentUser.username;
+export const showEditArticleButton = (authorUsername: string, currentUser?: CurrentUser) =>
+  authorUsername === currentUser?.username;
 
-export const showDeleteArticleButton = (authorUsername: string, currentUser?: Pick<User, "username">) =>
-  !!currentUser && authorUsername === currentUser.username;
+export const showDeleteArticleButton = (authorUsername: string, currentUser?: CurrentUser) =>
+  authorUsername === currentUser?.username;
 
 export const convertMarkdownToHtml = async (markdown: string) => {
   const processed = await unified().use(remarkParse).use(remarkRehype).use(rehypeStringify).process(markdown);
