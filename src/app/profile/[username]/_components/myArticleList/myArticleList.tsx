@@ -18,7 +18,15 @@ const Pages = ({ totalPages, currentPage }: { totalPages: number; currentPage: n
 );
 
 export const MyArticleList = async ({ username, currentPage }: { currentPage: number; username: string }) => {
-  const { articles, articlesCount } = await fetchArticlesByAuthor(username, currentPage);
+  let articles: Awaited<ReturnType<typeof fetchArticlesByAuthor>>["articles"] = [];
+  let articlesCount = 0;
+
+  try {
+    ({ articles, articlesCount } = await fetchArticlesByAuthor(username, currentPage));
+  } catch {
+    return <p>No articles found.</p>;
+  }
+
   const totalPages = calcTotalPageNumber(articlesCount, 10);
 
   return articles.length < 1 ? (
