@@ -33,10 +33,12 @@ export const signInAction = async (_prevState: unknown, formData: FormData) => {
   }
 
   switch (response.statusCode) {
-    // The login endpoint signals invalid credentials with either 401
-    // (Unauthorized) or 422 (GenericError). Both must surface the same
-    // user-facing message rather than the raw field errors.
+    // The login endpoint rejects invalid credentials with 401 (Unauthorized),
+    // 403 (Forbidden) or 422 (Unprocessable Entity) depending on the backend.
+    // All of these mean the same thing to the user and must surface the same
+    // message instead of throwing (which would render no error at all).
     case 401:
+    case 403:
     case 422:
       return submission.reply({
         formErrors: ["The email or password is incorrect."],
