@@ -4,7 +4,7 @@ import { createApiClient } from "@/utils/api/apiClient";
 import { getSession } from "@/utils/auth/session";
 import { SubmissionResult } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod";
-import { revalidateTag } from "next/cache";
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { inputsSchema } from "./types";
 
@@ -42,7 +42,7 @@ export const postCommentAction = async (
   const response = await apiClient.sendRequest();
 
   if (response.result === "success") {
-    revalidateTag("");
+    revalidatePath(`/article/${slug}`);
     return submission.reply();
   }
 
