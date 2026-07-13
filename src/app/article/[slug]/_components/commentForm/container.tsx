@@ -1,7 +1,8 @@
 "use client";
 
 import { User } from "@/utils/types/models";
-import { use, useActionState } from "react";
+import { useRouter } from "next/navigation";
+import { use, useActionState, useEffect } from "react";
 import { postCommentAction } from "./action";
 import { CommentForm as CommentFormPresentation } from "./presentation";
 
@@ -11,8 +12,20 @@ type Props = {
 };
 
 export const CommentForm = ({ slug, currentUserPromise }: Props) => {
+  const router = useRouter();
   const currentUser = currentUserPromise && use(currentUserPromise);
   const [state, action, isPending] = useActionState(postCommentAction, undefined);
+
+  // The comment list is rendered by the sibling `CommentList` server component.
+  // Because this form is submitted via a manual `startTransition` dispatch (to avoid
+  // resetting the form), the server action's `revalidatePath` does not reliably trigger
+  // a client re-render of that server component. Explicitly refresh the route after a
+  // successful post so the newly created comment is fetched and displayed.
+  useEffect(() => {
+    if (state?.status === "success") {
+      router.refresh();
+    }
+  }, [state, router]);
 
   return (
     <CommentFormPresentation
