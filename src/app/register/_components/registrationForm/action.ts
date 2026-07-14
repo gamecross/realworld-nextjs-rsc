@@ -28,7 +28,7 @@ export const signUpAction = async (_prevState: unknown, formData: FormData) => {
   const response = await client.sendRequest();
 
   if (response.result === "success") {
-    createSession(response.data.user.token);
+    await createSession(response.data.user.token);
     redirect("/");
   }
 
