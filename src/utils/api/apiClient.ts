@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "@/config/constants";
 import { ApiPath, ApiResponse, HttpErrorCode, HttpMethodOfPath, RequestParams } from "./apiTypes";
 
 const buildPathString = ({
@@ -55,7 +56,12 @@ export const createApiClient = <P extends ApiPath, M extends HttpMethodOfPath<P>
     const { getSession } = await import("@/utils/auth/session");
     const token = await getSession();
 
-    const response = await fetch(process.env.API_BASE_URL + fullPath, {
+    // Read the base URL at request time (not at module-load time) so that the
+    // value is resolved from the current environment. Reading it lazily avoids
+    // capturing `undefined` when the env var is populated after module import.
+    const baseUrl = process.env.API_BASE_URL ?? API_BASE_URL;
+
+    const response = await fetch(baseUrl + fullPath, {
       method,
       headers: {
         Accept: "application/json",
