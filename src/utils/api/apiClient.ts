@@ -56,12 +56,7 @@ export const createApiClient = <P extends ApiPath, M extends HttpMethodOfPath<P>
     const { getSession } = await import("@/utils/auth/session");
     const token = await getSession();
 
-    // Read the base URL at request time (not at module-load time) so that the
-    // value is resolved from the current environment. Reading it lazily avoids
-    // capturing `undefined` when the env var is populated after module import.
-    const baseUrl = process.env.API_BASE_URL ?? API_BASE_URL;
-
-    const response = await fetch(baseUrl + fullPath, {
+    const response = await fetch(API_BASE_URL + fullPath, {
       method,
       headers: {
         Accept: "application/json",
@@ -81,10 +76,14 @@ export const createApiClient = <P extends ApiPath, M extends HttpMethodOfPath<P>
     }
 
     if (isExpectedErrorCode(response.status)) {
+      // Some error responses (e.g. 401 Unauthorized) have an empty body per the
+      // API contract. Calling response.json() on an empty body throws a
+      // SyntaxError, so read the body as text first and only parse when present.
+      const errorBody = await response.text();
       return {
         result: "error",
         statusCode: response.status,
-        error: await response.json(),
+        error: errorBody ? JSON.parse(errorBody) : undefined,
       };
     }
 
