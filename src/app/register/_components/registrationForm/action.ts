@@ -3,6 +3,7 @@
 import { createApiClient } from "@/utils/api/apiClient";
 import { createSession } from "@/utils/auth/session";
 import { parseWithZod } from "@conform-to/zod";
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { inputsSchema } from "./types";
 
@@ -29,6 +30,10 @@ export const signUpAction = async (_prevState: unknown, formData: FormData) => {
 
   if (response.result === "success") {
     await createSession(response.data.user.token);
+    // Invalidate the cached root layout so the shared <Header> re-renders with
+    // the new authenticated session instead of serving the stale (logged-out)
+    // layout from the Router Cache after the redirect below.
+    revalidatePath("/", "layout");
     redirect("/");
   }
 
