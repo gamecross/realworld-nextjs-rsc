@@ -1,4 +1,3 @@
-import { API_BASE_URL } from "@/config/constants";
 import { ApiPath, ApiResponse, HttpErrorCode, HttpMethodOfPath, RequestParams } from "./apiTypes";
 
 const buildPathString = ({
@@ -56,7 +55,7 @@ export const createApiClient = <P extends ApiPath, M extends HttpMethodOfPath<P>
     const { getSession } = await import("@/utils/auth/session");
     const token = await getSession();
 
-    const response = await fetch(API_BASE_URL + fullPath, {
+    const response = await fetch(process.env.API_BASE_URL + fullPath, {
       method,
       headers: {
         Accept: "application/json",
@@ -76,10 +75,16 @@ export const createApiClient = <P extends ApiPath, M extends HttpMethodOfPath<P>
     }
 
     if (isExpectedErrorCode(response.status)) {
+      // Some error responses (e.g. an authentication failure) come back with an
+      // empty or non-JSON body. Calling response.json() directly would throw a
+      // SyntaxError that escapes the server action, so it never returns the form
+      // error and the login page renders no <ul.error-messages>. Read the body as
+      // text first and only parse it when it actually contains JSON.
+      const errorBody = await response.text();
       return {
         result: "error",
         statusCode: response.status,
-        error: await response.json(),
+        error: errorBody ? JSON.parse(errorBody) : undefined,
       };
     }
 
