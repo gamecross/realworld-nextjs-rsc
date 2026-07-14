@@ -38,7 +38,10 @@ export const signInAction = async (_prevState: unknown, formData: FormData) => {
   }
 
   switch (response.statusCode) {
+    // A failed login can surface as 401 (Unauthorized) or 403 (Forbidden)
+    // depending on the backend; both mean the credentials were rejected.
     case 401:
+    case 403:
       return submission.reply({
         formErrors: ["Login failed. The email or password is incorrect."],
       });
@@ -47,6 +50,11 @@ export const signInAction = async (_prevState: unknown, formData: FormData) => {
         formErrors: Object.values(response.error.errors).flat(),
       });
     default:
-      throw new Error("api error");
+      // Never crash the action on an unexpected auth response — surface a
+      // generic form error so the user stays on /login with feedback instead
+      // of hitting an unhandled server-action exception.
+      return submission.reply({
+        formErrors: ["Login failed. The email or password is incorrect."],
+      });
   }
 };
