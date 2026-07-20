@@ -1,8 +1,7 @@
 import { createApiClient } from "@/utils/api/apiClient";
 import { Profile } from "@/utils/types/models";
-import { cache } from "react";
 
-export const fetchProfile = cache(async (username: string) => {
+export const fetchProfile = async (username: string) => {
   const client = createApiClient({
     path: "/profiles/{username}",
     method: "get",
@@ -20,4 +19,4 @@ export const fetchProfile = cache(async (username: string) => {
   }
 
   throw new Error("api error");
-});
+};
